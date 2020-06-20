@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 flask = "*"
 waitress = "*"
+flask-restplus = "*"
+werkzeug = "==0.16.1"
 
 [requires]
 python_version = "3.8"
