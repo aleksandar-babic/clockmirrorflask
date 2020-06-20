@@ -161,6 +161,8 @@ terraform init -backend-config="bucket=<tf-state-bucket-name>" -backend-config="
 terraform apply -var 'env=<env_name>' -var 'tf_state_bucket=<bucket_name>'
 ```
 > `GITHUB_TOKEN` is required (as per terraform documentation) when using `GitHub` as CodePipeline source, it's enough to give it only `public:repo` access.
+  
+> Utilizing terraform workspaces is a good idea if you plan on deploying multiple CICD instances in the same account.
 
 Once `terraform apply` is done, the pipeline will be triggered automatically.
   
