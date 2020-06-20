@@ -1,3 +1,7 @@
+data "aws_s3_bucket" "tf_state" {
+  bucket = var.tf_state_bucket
+}
+
 data "template_file" "buildspec_static_analysis" {
   template = file("${path.module}/tpl/buildspec_static_analysis.tpl")
 }
@@ -19,7 +23,8 @@ data "template_file" "buildspec_deploy_ecr" {
   vars = {
     image_name      = "${var.app_name}-${var.env}"
     env             = var.env
-    tf_state_bucket = var.tf_state_bucket
+    tf_state_bucket = data.aws_s3_bucket.tf_state.id
+    tf_region       = var.region
   }
 }
 
@@ -29,7 +34,8 @@ data "template_file" "buildspec_deploy_app" {
   vars = {
     env             = var.env
     ecr_repo        = "${var.app_name}-${var.env}"
-    tf_state_bucket = var.tf_state_bucket
+    tf_state_bucket = data.aws_s3_bucket.tf_state.id
+    tf_region       = var.region
   }
 }
 
@@ -59,7 +65,20 @@ resource "aws_iam_role_policy" "codebuild_deploy_ecr" {
     "Version": "2012-10-17",
     "Statement": [
         {
+          "Effect":"Allow",
+          "Action": [
+            "s3:*"
+          ],
+          "Resource": [
+            "${aws_s3_bucket.codepipeline_artifacts.arn}",
+            "${aws_s3_bucket.codepipeline_artifacts.arn}/*",
+            "${data.aws_s3_bucket.tf_state.arn}",
+            "${data.aws_s3_bucket.tf_state.arn}/*"
+          ]
+        },
+        {
             "Action": [
+                "logs:*",
                 "ecr:*"
             ],
             "Resource": "*",
@@ -97,28 +116,29 @@ resource "aws_iam_role_policy" "codebuild_deploy_app" {
     "Version": "2012-10-17",
     "Statement": [
         {
+          "Effect":"Allow",
+          "Action": [
+            "s3:*"
+          ],
+          "Resource": [
+            "${aws_s3_bucket.codepipeline_artifacts.arn}",
+            "${aws_s3_bucket.codepipeline_artifacts.arn}/*",
+            "${data.aws_s3_bucket.tf_state.arn}",
+            "${data.aws_s3_bucket.tf_state.arn}/*"
+          ]
+        },
+        {
             "Action": [
+                "logs:*",
                 "ecr:*",
                 "ecs:*",
+                "ec2:*",
                 "iam:*",
                 "elasticloadbalancing:*"
             ],
             "Resource": "*",
             "Effect": "Allow",
             "Sid": "AllowDeployApp"
-        },
-        {
-            "Action": [
-                "ec2:DescribeDhcpOptions",
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:DeleteNetworkInterface",
-                "ec2:DescribeSubnets",
-                "ec2:DescribeSecurityGroups",
-                "ec2:DescribeVpcs"
-            ],
-            "Resource": "*",
-            "Effect": "Allow",
-            "Sid": "AllowVPCRO"
         }
     ]
 }
@@ -144,10 +164,39 @@ resource "aws_iam_role" "codebuild_base" {
 EOF
 }
 
+resource "aws_iam_role_policy" "codebuild_base" {
+  role   = aws_iam_role.codebuild_base.id
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+          "Effect":"Allow",
+          "Action": [
+            "s3:*"
+          ],
+          "Resource": [
+            "${aws_s3_bucket.codepipeline_artifacts.arn}",
+            "${aws_s3_bucket.codepipeline_artifacts.arn}/*"
+          ]
+        },
+        {
+            "Action": [
+                "logs:*"
+            ],
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": "AllowBase"
+        }
+    ]
+}
+EOF
+}
+
 resource "aws_codebuild_project" "static_analysis" {
   name          = "${var.app_name}-${var.env}-static-analysis"
   service_role  = aws_iam_role.codebuild_base.arn
-  build_timeout = "15"
+  build_timeout = var.codebuild_build_timeout
   description   = "Static analysis stage of ${var.app_name}-${var.env} component."
 
   artifacts {
@@ -155,7 +204,7 @@ resource "aws_codebuild_project" "static_analysis" {
   }
 
   environment {
-    compute_type                = "BUILD_GENERAL1_SMALL"
+    compute_type                = var.codebuild_compute_type
     image                       = var.codebuild_env_image
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
@@ -180,7 +229,7 @@ resource "aws_codebuild_project" "static_analysis" {
 resource "aws_codebuild_project" "unit_test" {
   name          = "${var.app_name}-${var.env}-unit-test"
   service_role  = aws_iam_role.codebuild_base.arn
-  build_timeout = "15"
+  build_timeout = var.codebuild_build_timeout
   description   = "Unit Test stage of ${var.app_name}-${var.env} component."
 
   artifacts {
@@ -188,7 +237,7 @@ resource "aws_codebuild_project" "unit_test" {
   }
 
   environment {
-    compute_type                = "BUILD_GENERAL1_SMALL"
+    compute_type                = var.codebuild_compute_type
     image                       = var.codebuild_env_image
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
@@ -214,7 +263,7 @@ resource "aws_codebuild_project" "unit_test" {
 resource "aws_codebuild_project" "build" {
   name          = "${var.app_name}-${var.env}-build"
   service_role  = aws_iam_role.codebuild_base.arn
-  build_timeout = "15"
+  build_timeout = var.codebuild_build_timeout
   description   = "Build stage of ${var.app_name}-${var.env} component."
 
   artifacts {
@@ -222,7 +271,7 @@ resource "aws_codebuild_project" "build" {
   }
 
   environment {
-    compute_type                = "BUILD_GENERAL1_SMALL"
+    compute_type                = var.codebuild_compute_type
     image                       = var.codebuild_env_image
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
@@ -248,7 +297,7 @@ resource "aws_codebuild_project" "build" {
 resource "aws_codebuild_project" "deploy_ecr" {
   name          = "${var.app_name}-${var.env}-deploy-ecr"
   service_role  = aws_iam_role.codebuild_deploy_ecr.arn
-  build_timeout = "15"
+  build_timeout = var.codebuild_build_timeout
   description   = "Deploy stage of ${var.app_name}-${var.env} component."
 
   artifacts {
@@ -256,7 +305,7 @@ resource "aws_codebuild_project" "deploy_ecr" {
   }
 
   environment {
-    compute_type                = "BUILD_GENERAL1_SMALL"
+    compute_type                = var.codebuild_compute_type
     image                       = var.codebuild_env_image
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
@@ -282,7 +331,7 @@ resource "aws_codebuild_project" "deploy_ecr" {
 resource "aws_codebuild_project" "deploy_app" {
   name          = "${var.app_name}-${var.env}-deploy-app"
   service_role  = aws_iam_role.codebuild_deploy_app.arn
-  build_timeout = "15"
+  build_timeout = var.codebuild_build_timeout
   description   = "Deploy stage of ${var.app_name}-${var.env} component."
 
   artifacts {
@@ -290,7 +339,7 @@ resource "aws_codebuild_project" "deploy_app" {
   }
 
   environment {
-    compute_type                = "BUILD_GENERAL1_SMALL"
+    compute_type                = var.codebuild_compute_type
     image                       = var.codebuild_env_image
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
@@ -305,27 +354,6 @@ resource "aws_codebuild_project" "deploy_app" {
   source {
     type      = "CODEPIPELINE"
     buildspec = data.template_file.buildspec_deploy_app.rendered
-  }
-
-  lifecycle {
-    ignore_changes = [tags["CreatorName"]]
-  }
-}
-
-resource "aws_s3_bucket" "codepipeline_artifacts" {
-  force_destroy = true
-  acl           = "private"
-
-  versioning {
-    enabled = false
-  }
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
   }
 
   lifecycle {
