@@ -23,7 +23,7 @@ def validate_mirror_time(time: str) -> str:
 
     TIME_PATTERN = re.compile(r'(1[0-2]|0?[1-9]):([0-5][0-9])')
     if not TIME_PATTERN.fullmatch(time):
-        raise ValueError(f'{time} is not valid time, expecting HH:MM format.')
+        raise ValueError(f'{time} is not valid time, expecting HH:MM, where HH is 1 <= HH < 13.')
 
     if len(time.split(':')[0]) == 1:
         return f'0{time}'
