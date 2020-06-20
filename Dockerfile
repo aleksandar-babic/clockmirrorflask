@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED 1
 COPY Pipfile Pipfile.lock ./
 
 # Install package manager and dependencies
-RUN pip install pipenv && \
+RUN pip install --upgrade pipenv && \
     pipenv install --deploy --system && \
     # Always clean up behind youself!
     pip uninstall pipenv -y
@@ -19,6 +19,6 @@ RUN useradd --create-home appuser
 WORKDIR /home/appuser
 USER appuser
 
-COPY app.py ./
+COPY src/ ./
 
 CMD ["python", "app.py"]
