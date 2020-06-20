@@ -12,7 +12,7 @@ clock_namespace = api.namespace('clock', description='Clock API')
 class ClockHandler(Resource):
     @api.doc(description='Endpoint that will return actual time for given mirror time.')
     @api.doc(responses={500: 'Internal server error', 200: 'Time successfully converted',
-                        400: 'Bad request, no mirror_time given'},
+                        400: 'Bad request, no mirror_time given or given time invalid'},
              params={'mirror_time': 'Time seen in the mirror'})
     def get(self):
         args = request.args
