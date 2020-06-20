@@ -3,3 +3,7 @@
 
 # Pytest cache
 .pytest_cache
+
+# Terraform
+*.terraform
+*.tfvars
