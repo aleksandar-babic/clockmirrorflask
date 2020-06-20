@@ -4,6 +4,7 @@ from flask_restplus import Api, Resource
 from clock_mirror import calculate_mirror_time, validate_mirror_time
 
 app = Flask(__name__)
+app.config.SWAGGER_UI_DOC_EXPANSION = 'full'
 api = Api(app=app)
 clock_namespace = api.namespace('clock', description='Clock API')
 
