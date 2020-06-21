@@ -32,12 +32,14 @@ def calculate_mirror_time(time: str) -> str:
     if minute != 0:
         minute = MAX_MINUTES - minute
 
-    if minute >= 1:
         next_hour = hour + 1
         if next_hour >= MAX_HOURS:
-            next_hour = next_hour - MAX_HOURS
+            next_hour -= MAX_HOURS
 
         hour = MAX_HOURS - next_hour
+    else:
+        if hour != 12:
+            hour = MAX_HOURS - hour
 
     return f'{add_leading_zero(hour)}:{add_leading_zero(minute)}'
 

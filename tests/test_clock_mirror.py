@@ -60,6 +60,14 @@ class TestClockMirrorSuite:
                 'actual': '07:35'
             },
             {
+                'mirror': '10:00',
+                'actual': '02:00'
+            },
+            {
+                'mirror': '11:00',
+                'actual': '01:00'
+            },
+            {
                 'mirror': '12:00',
                 'actual': '12:00'
             }
