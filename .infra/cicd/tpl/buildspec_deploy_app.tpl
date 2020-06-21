@@ -23,4 +23,5 @@ phases:
       - cd .infra/app
       - terraform init -backend-config="bucket=$${TERRAFORM_STATE_BUCKET}" -backend-config="region=$${TF_VAR_region}"
       - terraform workspace select $${TF_VAR_env} || terraform workspace new $${TF_VAR_env}
+      - terraform taint aws_ecs_task_definition.clockmirrorflask
       - terraform apply -input=false --auto-approve
