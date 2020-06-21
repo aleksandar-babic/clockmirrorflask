@@ -45,8 +45,10 @@ phases:
       - echo "Pushing Docker image"
       - docker push $${repo_url}:latest
       - docker push $${repo_url}:$${CODEBUILD_RESOLVED_SOURCE_VERSION}
-      - echo '{"name": "$${APP_NAME}", "imageUri": "$${repo_url}:$${CODEBUILD_RESOLVED_SOURCE_VERSION}"}' > imagedefinitions.json
+      - >
+       echo "[{\"name\": \"$${APP_NAME}\", \"imageUri\": \"$${repo_url}:$${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}]" > /tmp/imagedefinitions.json
 
 artifacts:
   files:
-    - imagedefinitions.json
+    - /tmp/imagedefinitions.json
+  discard-paths: yes
