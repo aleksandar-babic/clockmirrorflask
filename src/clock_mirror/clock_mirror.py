@@ -27,7 +27,8 @@ def calculate_mirror_time(time: str) -> str:
 
     hour, minute = time.split(':')
 
-    minute = add_leading_zero(MAX_MINUTES - int(minute))
+    if int(minute) != 0:
+        minute = add_leading_zero(MAX_MINUTES - int(minute))
 
     if int(minute) >= 1:
         next_hour = int(hour) + 1
