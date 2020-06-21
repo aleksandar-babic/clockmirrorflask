@@ -26,18 +26,20 @@ def calculate_mirror_time(time: str) -> str:
     MAX_MINUTES = 60
 
     hour, minute = time.split(':')
+    hour = int(hour)
+    minute = int(minute)
 
-    if int(minute) != 0:
-        minute = add_leading_zero(MAX_MINUTES - int(minute))
+    if minute != 0:
+        minute = MAX_MINUTES - minute
 
-    if int(minute) >= 1:
-        next_hour = int(hour) + 1
+    if minute >= 1:
+        next_hour = hour + 1
         if next_hour >= MAX_HOURS:
             next_hour = next_hour - MAX_HOURS
 
-        hour = add_leading_zero(MAX_HOURS - next_hour)
+        hour = MAX_HOURS - next_hour
 
-    return f'{hour}:{minute}'
+    return f'{add_leading_zero(hour)}:{add_leading_zero(minute)}'
 
 
 def validate_mirror_time(time: str) -> str:
