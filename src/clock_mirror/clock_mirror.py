@@ -1,6 +1,20 @@
 import re
 
 
+def add_leading_zero(time_part: int) -> str:
+    """
+    Function that will add missing leading zero if needed.
+
+    :param time_part:
+    :return: leading zero guaranteed time part
+    """
+
+    if time_part <= 9:
+        return f'0{time_part}'
+
+    return str(time_part)
+
+
 def calculate_mirror_time(time: str) -> str:
     """
     Function that will calculate actual time from the mirror time.
@@ -8,7 +22,21 @@ def calculate_mirror_time(time: str) -> str:
     :param time: time seen in the mirror
     :return: actual time
     """
-    return time
+    MAX_HOURS = 12
+    MAX_MINUTES = 60
+
+    hour, minute = time.split(':')
+
+    minute = add_leading_zero(MAX_MINUTES - int(minute))
+
+    if int(minute) >= 1:
+        next_hour = int(hour) + 1
+        if next_hour >= MAX_HOURS:
+            next_hour = next_hour - MAX_HOURS
+
+        hour = add_leading_zero(MAX_HOURS - next_hour)
+
+    return f'{hour}:{minute}'
 
 
 def validate_mirror_time(time: str) -> str:
