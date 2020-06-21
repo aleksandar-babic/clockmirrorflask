@@ -36,9 +36,11 @@ phases:
       - terraform output -json > output.json
       - export repo_url=$(cat output.json | jq -r '.ecr_repo_url.value')
       - docker tag $${DOCKER_IMAGE_NAME} $${repo_url}:latest
+      - docker tag $${DOCKER_IMAGE_NAME} $${repo_url}:$${CODEBUILD_RESOLVED_SOURCE_VERSION}
 
   post_build:
     commands:
       - echo ECR Deploy completed on `date`
       - echo "Pushing Docker image"
       - docker push $${repo_url}:latest
+      - docker push $${repo_url}:$${CODEBUILD_RESOLVED_SOURCE_VERSION}

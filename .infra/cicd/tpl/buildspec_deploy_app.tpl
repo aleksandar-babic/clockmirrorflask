@@ -8,6 +8,7 @@ env:
     TF_VAR_region: ${tf_region}
     TF_VAR_env: ${env}
     TF_VAR_ecr_repo_name: ${ecr_repo}
+    TF_VAR_ecr_repo_tag: $CODEBUILD_RESOLVED_SOURCE_VERSION
 
 phases:
   install:
@@ -23,5 +24,4 @@ phases:
       - cd .infra/app
       - terraform init -backend-config="bucket=$${TERRAFORM_STATE_BUCKET}" -backend-config="region=$${TF_VAR_region}"
       - terraform workspace select $${TF_VAR_env} || terraform workspace new $${TF_VAR_env}
-      - terraform taint aws_ecs_task_definition.clockmirrorflask
       - terraform apply -input=false --auto-approve

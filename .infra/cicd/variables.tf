@@ -45,13 +45,13 @@ variable "tf_state_bucket" {
 }
 
 variable "codebuild_compute_type" {
-  type = string
+  type        = string
   description = "Compute type used in Codebuilds"
-  default = "BUILD_GENERAL1_SMALL"
+  default     = "BUILD_GENERAL1_SMALL"
 }
 
 variable "codebuild_build_timeout" {
-  type = string
+  type        = string
   description = "Timeout used in Codebuilds"
-  default = "15"
+  default     = "15"
 }
