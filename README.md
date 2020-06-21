@@ -29,6 +29,7 @@ So there is no 00:20, instead it is 12:20.
 
 There is no 13:20, instead it is 01:20.
 ```
+![visual](.github/img/visual.png)
 
 Purpose of this repository is to showcase full CICD -> ECS IaC flow, actual 'problem' that we are solving is just a side story, of course.
 
