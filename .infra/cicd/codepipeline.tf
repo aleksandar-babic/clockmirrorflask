@@ -180,5 +180,20 @@ resource "aws_codepipeline" "main" {
         ProjectName = aws_codebuild_project.deploy_app.name
       }
     }
+
+    action {
+      name            = "UpdateECSService"
+      category        = "Deploy"
+      owner           = "AWS"
+      provider        = "ECS"
+      input_artifacts = ["deployecr_output"]
+      version         = "1"
+      run_order       = "3"
+
+      configuration = {
+        ClusterName = "${var.app_name}-${var.env}"
+        ServiceName = "api"
+      }
+    }
   }
 }

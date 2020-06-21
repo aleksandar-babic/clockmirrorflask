@@ -23,6 +23,7 @@ data "template_file" "buildspec_deploy_ecr" {
   vars = {
     image_name      = "${var.app_name}-${var.env}"
     env             = var.env
+    app_name        = var.app_name
     tf_state_bucket = data.aws_s3_bucket.tf_state.id
     tf_region       = var.region
   }

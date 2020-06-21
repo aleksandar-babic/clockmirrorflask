@@ -23,7 +23,7 @@ resource "aws_ecs_task_definition" "clockmirrorflask" {
   [
     {
       "name": "${var.app_name}",
-      "image": "${data.aws_ecr_repository.app.repository_url}:${var.ecr_repo_tag}",
+      "image": "${data.aws_ecr_repository.app.repository_url}",
       "essential": true,
       "portMappings": [
         {

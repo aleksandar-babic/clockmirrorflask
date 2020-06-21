@@ -5,8 +5,9 @@ env:
     TERRAFORM_VERSION: "0.12.26"
     TERRAFORM_PATH: "/usr/local/bin"
     TERRAFORM_STATE_BUCKET: ${tf_state_bucket}
-    TF_VAR_region: ${tf_region}
     DOCKER_IMAGE_NAME: ${image_name}
+    APP_NAME: ${app_name}
+    TF_VAR_region: ${tf_region}
     TF_VAR_env: ${env}
 
 phases:
@@ -44,3 +45,8 @@ phases:
       - echo "Pushing Docker image"
       - docker push $${repo_url}:latest
       - docker push $${repo_url}:$${CODEBUILD_RESOLVED_SOURCE_VERSION}
+      - echo '{"name": "$${APP_NAME}", "imageUri": "$${repo_url}:$${CODEBUILD_RESOLVED_SOURCE_VERSION}"}' > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json

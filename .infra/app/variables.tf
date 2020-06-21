@@ -38,11 +38,6 @@ variable "ecr_repo_name" {
   description = "Name of the app ECR repo to lookup"
 }
 
-variable "ecr_repo_tag" {
-  type        = string
-  description = "ECR Repo tag to use"
-}
-
 variable "ecs_service_api_desired_count" {
   type        = number
   description = "Number of desired count for the API service"

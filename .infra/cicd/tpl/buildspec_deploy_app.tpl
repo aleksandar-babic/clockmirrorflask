@@ -8,7 +8,6 @@ env:
     TF_VAR_region: ${tf_region}
     TF_VAR_env: ${env}
     TF_VAR_ecr_repo_name: ${ecr_repo}
-    TF_VAR_ecr_repo_tag: $CODEBUILD_RESOLVED_SOURCE_VERSION
 
 phases:
   install:
