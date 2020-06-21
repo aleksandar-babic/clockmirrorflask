@@ -105,6 +105,7 @@ The pipeline has following stages:
 * Deploy
     * DeployECR
     * DeployApp
+    * UpdateECSService
 
 ![pipeline](.github/img/pipeline.png)
 
@@ -139,9 +140,11 @@ stage has 2 actions:
 
 * DeployECR
     * Run Terraform to create/modify ECR repository
-    * Load built image and push it to the ECR repository
+    * Load built image and push it to the ECR repository (with 2 tags, current commit hash and `latest`)
 * DeployApp
     * Run Terraform to create/modify API resources
+* UpdateECSService
+    * Use `Amazon ECS` Deploy provider to update ECS service with latest tasks
 
 # Deployment into AWS Environment
 In order to deploy the API (including CICD) in the AWS environment, you have to apply CICD terraform from the local machine for the first time, after that CodePipeline will observe the repository and deploy whenever new commit is pushed to the remote origin.
@@ -172,6 +175,7 @@ API Url is shown in `DeployApp` action outputs.
 ### Possible improvements
 I've limited scope of this project because purpose of this was just to showcase whole CICD -> ECS flow, but some of the improvements I would like to add in the future are:
 * Implement semver releases
+* Implement TF variables configuration manager store overrides (secrets manager/parameter store)
 * Use non-default VPC in ECS
 * Add auto-scaling in the ECS
 * Add other angles of testing (integration, smoke, e2e)
