@@ -61,6 +61,15 @@ resource "aws_iam_role_policy" "codepipeline" {
         "codebuild:StartBuild"
       ],
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole",
+        "ecs:*",
+        "ecr:*"
+      ],
+      "Resource": "*"
     }
   ]
 }
