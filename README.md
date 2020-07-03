@@ -34,7 +34,7 @@ There is no 13:20, instead it is 01:20.
 Purpose of this repository is to showcase full CICD -> ECS IaC flow, actual 'problem' that we are solving is just a side story, of course.
 
 # Live demo
-The API is live at [http://clockmirrorflask-master-1509826507.eu-west-1.elb.amazonaws.com/](http://clockmirrorflask-master-1509826507.eu-west-1.elb.amazonaws.com/).
+~~The API is live at [http://clockmirrorflask-master-1509826507.eu-west-1.elb.amazonaws.com/](http://clockmirrorflask-master-1509826507.eu-west-1.elb.amazonaws.com/).~~ (resources destroyed at the moment)
 
 ![swagger](.github/img/swagger.png)
 
